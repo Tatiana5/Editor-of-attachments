@@ -1,0 +1,13 @@
+services:
+    tatiana5.editor_of_attachments.listener:
+        class: tatiana5\editor_of_attachments\event\listener
+        arguments:
+            - @auth
+            - @config
+            - @template
+            - @user
+            - @dbal.conn
+            - %core.root_path%
+            - %core.php_ext%
+        tags:
+            - { name: event.listener }
