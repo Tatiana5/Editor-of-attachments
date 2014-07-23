@@ -1,9 +1,9 @@
 <?php
 /**
 *
-* quickreply [Ukrainian]
+* editor_of_attachments [Ukrainian]
 *
-* @package language quickreply
+* @package language editor_of_attachments
 * @copyright (c) 2013 Oleksii Frychyn (Sherlock)
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
