@@ -4,7 +4,7 @@
 * quickreply [Russian]
 *
 * @package language quickreply
-* @copyright (c) 2013 Татьяна5
+* @copyright (c) 2014 Татьяна5
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
