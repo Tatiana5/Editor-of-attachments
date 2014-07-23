@@ -1,10 +1,10 @@
 <?php
 /**
 *
-* quickreply [Ukrainian]
+* editor_of_attachments [Ukrainian]
 *
-* @package language quickreply
-* @copyright (c) 2013 Oleksii Frychyn (Sherlock)
+* @package language editor_of_attachments
+* @copyright (c) 20134 Oleksii Frychyn (Sherlock)
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
