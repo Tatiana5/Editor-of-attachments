@@ -12,32 +12,35 @@ namespace tatiana5\editor_of_attachments\acp;
 class editor_of_attachments_module
 {
 	var $u_action;
-	var $max_rep_id;
-	var $step = 1000;
 
 	function main($id, $mode)
 	{
-		global $cache, $config, $db, $user, $auth, $template, $request;
-		global $phpbb_root_path, $phpEx, $phpbb_admin_path, $phpbb_container;
+		global $config, $db, $user, $auth, $template, $request;
+		global $phpbb_root_path, $phpEx;
 
 		$this->page_title = 'ACP_EDITOR_OF_ATTACHMENTS';
-		$this->tpl_name = 'acp_editor_of_attachments';
-		
-		$submit = (isset($_POST['submit'])) ? true : false;
+		$this->tpl_name = 'acp_board';
+
+		$submit = $request->is_set_post('submit');
+
 		$form_key = 'config_editor_of_attachments';
 		add_form_key($form_key);
-		
+
 		$display_vars = array(
 			'title'	=> 'ACP_EDITOR_OF_ATTACHMENTS',
 			'vars'	=> array(
-				'legend1'		=> 'ACP_ATTACH_RESIZE',
-				'allow_attach_resize'	=> array('lang' => 'ACP_ALLOW_ATTACH_RESIZE', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => true),
-				'attach_resize_width'	=> array('lang' => 'ACP_ATTACH_RESIZE_WIDHT', 'validate' => 'int:0', 'type' => 'number:0:99999', 'explain' => false,),
-				'attach_resize_height'	=> array('lang' => 'ACP_ATTACH_RESIZE_HEIGHT', 'validate' => 'int:0', 'type' => 'number:0:99999', 'explain' => false,),
-				
-				'legend2'				=> 'ACP_QUOTE_ATTACH',
+				'legend1'		=> 'ACP_QUOTE_ATTACH',
 				'allow_quote_attach'	=> array('lang' => 'ACP_ALLOW_QUOTE_ATTACH', 'validate' => 'bool', 'type' => 'radio:yes_no', 'explain' => true),
-				
+
+				'legend2'				=> 'ACP_WATERMARK_ATTACH',
+				'img_create_watermark'		=> array('lang' => 'CREATE_WATERMARK',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => false),
+				//'user_confirm_watermark'	=> array('lang' => 'USER_CONFIRM_WATERMARK','validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+				'watermark_opacity'			=> array('lang' => 'WATERMARK_OPACITY',		'validate' => 'int',	'type' => 'text:3:3', 'explain' => true, 'append' => ' ' . $user->lang['PERCENT']),
+				'attach_img_quality'	=> array('lang' => 'ACP_ATTACH_IMG_QUALITY', 'validate' => 'int:0', 'type' => 'number:50:99', 'explain' => true, 'append' => ' ' . $user->lang['PERCENT']),
+				'default_position'			=> array('lang' => 'WATERMARK_POSITION',	'validate' => 'string', 'type' => 'custom', 'method' => 'position_select', 'params' => array('{CONFIG_VALUE}', 1), 'explain' => true),
+				'watermark_min_img_size'	=> array('lang' => 'WM_IMG_MIN_SIZE',	'validate' => 'int',	'type' => 'text:3:3', 'explain' => true, 'append' => ' ' . $user->lang['PIXEL']),
+				'wm_img_type'				=> array('lang' => 'WM_IMG_TYPE',		'validate' => 'string', 'type' => 'custom', 'method' => 'img_select_type', 'explain' => true),
+
 				'legend3'				=> 'ACP_SUBMIT_CHANGES',
 			),
 		);
@@ -48,7 +51,7 @@ class editor_of_attachments_module
 		}
 
 		$this->new_config = $config;
-		$cfg_array = (isset($_REQUEST['config'])) ? utf8_normalize_nfc(request_var('config', array('' => ''), true)) : $this->new_config;
+		$cfg_array = ($request->is_set('config')) ? utf8_normalize_nfc($request->variable('config', array('' => ''), true)) : $this->new_config;
 		$error = array();
 
 		// We validate the complete config if wished
@@ -63,7 +66,7 @@ class editor_of_attachments_module
 		{
 			$submit = false;
 		}
-		
+
 		// We go through the display_vars to make sure no one is trying to set variables he/she is not allowed to...
 		foreach ($display_vars['vars'] as $config_name => $null)
 		{
@@ -76,17 +79,22 @@ class editor_of_attachments_module
 
 			if ($submit)
 			{
-				set_config($config_name, $config_value);
+				$config->set($config_name, $config_value);
 			}
 		}
-		
+
 		if ($submit)
 		{
+			// Image Watermark Start
+			$s_wm_type = $request->variable('wm_img_type', array(''));
+			$s_wm_type = serialize($s_wm_type);
+			$config->set('wm_img_type', $s_wm_type);
+
 			trigger_error($user->lang['CONFIG_UPDATED'] . adm_back_link($this->u_action));
 		}
-		
+
 		$this->page_title = $display_vars['title'];
-		
+
 		$template->assign_vars(array(
 			'L_TITLE'			=> $user->lang[$display_vars['title']],
 			'L_TITLE_EXPLAIN'	=> $user->lang[$display_vars['title'] . '_EXPLAIN'],
@@ -144,6 +152,46 @@ class editor_of_attachments_module
 			unset($display_vars['vars'][$config_key]);
 		}
 	}
-}
 
-?>
+	// Image Watermark Position
+	function position_select($value, $key)
+	{
+		global $user, $config;
+
+		$default = isset($config['default_position']) ? $config['default_position'] : 'center';
+
+		$position_options = '<select id="default_position" name="config[default_position]">';
+		foreach ($user->lang['position'] as $key => $value)
+		{
+			$position_options .= '<option value="' . $key . '"' . (($key == $default) ? ' selected="selected"' : '') . '>';
+			$position_options .= $value;
+			$position_options .= '</option>';
+		}
+		$position_options .= '</select>';
+
+		return $position_options;
+	}
+
+	// Watermark Img Type
+	function img_select_type($value, $key)
+	{
+		global $user, $config;
+
+		$wm_type = array(
+			'jpg' => 'jpg, jpeg',
+			'gif' => 'gif',
+			'png' => 'png',
+		);
+		$default = (!empty($config['wm_img_type'])) ? unserialize($config['wm_img_type']) : array('jpg');
+		$wm_type_options = '<select id="' . $key . '" name="' . $key . '[]" multiple="multiple">';
+		foreach ($wm_type as $key => $value)
+		{
+			$wm_type_options .= '<option value="' . $key . '"' . ((in_array($key, $default)) ? ' selected="selected"' : '') . '>';
+			$wm_type_options .= $value;
+			$wm_type_options .= '</option>';
+		}
+		$wm_type_options .= '</select>';
+
+		return $wm_type_options;
+	}
+}

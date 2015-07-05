@@ -7,18 +7,18 @@
 *
 */
 
-namespace tatiana5\editor_of_attachments\migrations\v0xx;
+namespace tatiana5\editor_of_attachments\migrations\v1xx;
 
-class v_0_0_1 extends \phpbb\db\migration\migration
+class v_1_0_0 extends \phpbb\db\migration\migration
 {
 	public function effectively_installed()
 	{
-		return isset($this->config['editor_attach_version']) && version_compare($this->config['editor_attach_version'], '0.0.1', '>=');
+		return isset($this->config['editor_attach_version']) && version_compare($this->config['editor_attach_version'], '1.0.0', '>=');
 	}
 
 	static public function depends_on()
 	{
-			return array('\phpbb\db\migration\data\v310\dev');
+		return array('\phpbb\db\migration\data\v310\dev');
 	}
 
 	public function update_schema()
@@ -37,13 +37,17 @@ class v_0_0_1 extends \phpbb\db\migration\migration
 	{
 		return array(
 			// Add configs
-			array('config.add', array('allow_attach_resize', '1')),
-			array('config.add', array('attach_resize_width', '1024')),
-			array('config.add', array('attach_resize_height', '1024')),
 			array('config.add', array('allow_quote_attach', '1')),
 
+			array('config.add', array('attach_img_quality', '90')),
+			array('config.add', array('img_create_watermark', '0')),
+			//array('config.add', array('user_confirm_watermark', '0')),
+			array('config.add', array('watermark_opacity', '90')),
+			array('config.add', array('watermark_min_img_size', '200')),
+			array('config.add', array('default_position', '')),
+
 			// Current version
-			array('config.add', array('editor_attach_version', '0.0.1')),
+			array('config.add', array('editor_attach_version', '1.0.0')),
 
 			// Add ACP modules
 			array('module.add', array('acp', 'ACP_CAT_DOT_MODS', 'ACP_EDITOR_OF_ATTACHMENTS')),
@@ -51,7 +55,7 @@ class v_0_0_1 extends \phpbb\db\migration\migration
 					'module_basename'	=> '\tatiana5\editor_of_attachments\acp\editor_of_attachments_module',
 					'module_langname'	=> 'ACP_EDITOR_OF_ATTACHMENTS_EXPLAIN',
 					'module_mode'		=> 'config_editor_of_attachments',
-					'module_auth'		=> 'acl_a_editor_attach',
+					'module_auth'		=> 'ext_tatiana5/editor_of_attachments && acl_a_editor_attach',
 			))),
 			
 			// Add permissions

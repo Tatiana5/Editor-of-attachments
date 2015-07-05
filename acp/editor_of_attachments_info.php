@@ -18,10 +18,8 @@ class editor_of_attachments_info
 			'title'		=> 'ACP_EDITOR_OF_ATTACHMENTS',
 			'version'	=> '0.0.1',
 			'modes'		=> array(
-				'config_editor_of_attachments'		=> array('title' => 'ACP_EDITOR_OF_ATTACHMENTS', 'auth' => 'acl_a_editor_attach', 'cat' => array('ACP_EDITOR_OF_ATTACHMENTS')),
+				'config_editor_of_attachments'	=> array('title' => 'ACP_EDITOR_OF_ATTACHMENTS', 'auth' => 'ext_tatiana5/editor_of_attachments && acl_a_editor_attach', 'cat' => array('ACP_EDITOR_OF_ATTACHMENTS')),
 			),
 		);
 	}
 }
-
-?>
