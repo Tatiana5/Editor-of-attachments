@@ -9,5 +9,10 @@ services:
             - @dbal.conn
             - %core.root_path%
             - %core.php_ext%
+            - @tatiana5.editor_of_attachments.watermark
         tags:
             - { name: event.listener }
+    tatiana5.editor_of_attachments.watermark:
+        class: tatiana5\editor_of_attachments\core\watermark
+        arguments:
+            - @config
