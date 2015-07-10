@@ -131,11 +131,19 @@ class listener implements EventSubscriberInterface
 						if (in_array($attach_row['real_filename'], $attach_in_quote[1]))
 						{
 							//Replace inline attachments
-							if (!empty($this->config['seoimg_version']) && strpos($attach_row['mimetype'], 'image/') !== false)
+							if (strpos($attach_row['mimetype'], 'image/') !== false)
 							{
+								if (!empty($this->config['seoimg_version']))
+								{
+									$type_link = ($attach_row['thumbnail']) ? 'thumb' : 'small';
+									$img_link = generate_board_url() ."/{$type_link}/{$attach_row['attach_id']}.{$attach_row['extension']}";
+								}
+								else
+								{
+									$type_link = ($attach_row['thumbnail']) ? '&t=1' : '';
+									$img_link = generate_board_url() . '/download/file.php?id=' . (int) $attach_row['attach_id'] . $type_link;
+								}
 								//Replase image inline attachments in [img]
-								$type_link = ($attach_row['thumbnail']) ? 'thumb' : 'small';
-								$img_link = generate_board_url() ."/{$type_link}/{$attach_row['attach_id']}.{$attach_row['extension']}";
 								$message_parser->message = preg_replace('/\[attachment=\d+\]' . preg_quote($attach_row['real_filename']) . '\[\/attachment\]/', $img_open_tag . $img_link . $img_close_tag, $message_parser->message);
 							}
 							else
@@ -161,11 +169,19 @@ class listener implements EventSubscriberInterface
 						else
 						{
 							//Replace (not-inline) attachments
-							if (!empty($this->config['seoimg_version']) && strpos($attach_row['mimetype'], 'image/') !== false)
+							if (strpos($attach_row['mimetype'], 'image/') !== false)
 							{
+								if (!empty($this->config['seoimg_version']))
+								{
+									$type_link = ($attach_row['thumbnail']) ? 'thumb' : 'small';
+									$img_link = generate_board_url() ."/{$type_link}/{$attach_row['attach_id']}.{$attach_row['extension']}";
+								}
+								else
+								{
+									$type_link = ($attach_row['thumbnail']) ? '&t=1' : '';
+									$img_link = generate_board_url() . '/download/file.php?id=' . (int) $attach_row['attach_id'] . $type_link;
+								}
 								//Replace image attachments in [img]
-								$type_link = ($attach_row['thumbnail']) ? 'thumb' : 'small';
-								$img_link = generate_board_url() ."/{$type_link}/{$attach_row['attach_id']}.{$attach_row['extension']}";
 								$message_parser->message .= "\n" . $img_open_tag . $img_link . $img_close_tag;
 							}
 							else
